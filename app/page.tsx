@@ -21,25 +21,12 @@ export default function Home() {
   let height = 200;
   // let data = [1, 2];
   let [data, setData] = useState([1, 3]);
-  // let data = [useSpring(1), useSpring(2)];
-
-  // let progress = useMotionValue(1);
   function handleClick() {
     setData([2, 3]);
-    // animate(progress, [0, 1]);
-
-    // data[1].set(3);
   }
 
   let pies = d3.pie()(data);
 
-  // let animatedDs = [useMotionValue(arc(pies[0])), useMotionValue(arc(pies[1]))];
-
-  // let x = d3.interpolate(arc(pies[0]), arc(pies[1]));
-  // let int = d3.interpolate(animatedDs[0].get(), arc(pies[0]));
-  // let firstPie = useTransform(progress, (latest) => {
-  //   return int(latest);
-  // });
   let firstData = data[0];
   let firstPieData = useSpring(data[0]);
   useEffect(() => {
@@ -49,52 +36,6 @@ export default function Home() {
   let firstPie = useTransform(firstPieData, (latest) => {
     return arc(d3.pie()([latest, 3])[0]);
   });
-
-  // let firstPieStartAngleState = pies[0].startAngle;
-  // let firstPieStartAngle = useSpring(pies[0].startAngle);
-
-  // useEffect(() => {
-  //   firstPieStartAngle.set(firstPieStartAngleState);
-  // }, [firstPieStartAngle, firstPieStartAngleState]);
-
-  // let firstPie = useTransform(firstPieStartAngle, (latest) => {
-  //   return arc({ ...pies[0], startAngle: latest });
-  // });
-  // let firstPie = arc
-  // let firstPie = useTransform(
-  //   progress,
-  //   [0, 1],
-  //   [animatedDs[0].get(), arc(pies[0])],
-  //   {
-  //     mixer: (a, b) => {
-  //       // console.log("a", a);
-  //       // console.log("b", b);
-  //       let interpolator = d3.interpolate(a, b);
-  //       return (x) => {
-  //         return interpolator(x);
-  //         // console.log(x);
-  //       };
-  //     },
-  //   }
-  //   // { mixer: d3.interpolate }
-  // );
-  // animate(ds[0], 2, )
-  // let animatedDs = [arc(pies[0]), arc(pies[1])];
-  // let animatedDs = [
-  // useTransform(ds[0], [], [1], {mixer: d3.interpolate})
-
-  // let pies = d3.pie()([data[0].get(), data[1].get()]);
-  // let x = d3.interpolate(arc(pies[0]), arc(pies[1]));
-  // // console.log(x);
-  // // debugger;
-  // let animatedDs = [useMotionValue(arc(pies[0])), useMotionValue(arc(pies[1]))];
-
-  // useMotionValueEvent(data[1], "change", (latest) => {
-  //   let pies = d3.pie()([data[0].get(), data[1].get()]);
-
-  //   animatedDs[0].set(arc(pies[0]));
-  //   animatedDs[1].set(arc(pies[1]));
-  // });
 
   return (
     <div>
