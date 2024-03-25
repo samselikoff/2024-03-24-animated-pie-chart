@@ -20,38 +20,46 @@ export default function Home() {
   let width = 200;
   let height = 200;
   // let data = [1, 2];
-  let [data, setData] = useState([1, 2]);
+  let [data, setData] = useState([1, 3]);
   // let data = [useSpring(1), useSpring(2)];
 
-  let progress = useMotionValue(1);
+  // let progress = useMotionValue(1);
   function handleClick() {
-    setData([1, 3]);
-    animate(progress, [0, 1]);
+    setData([2, 3]);
+    // animate(progress, [0, 1]);
 
     // data[1].set(3);
   }
 
   let pies = d3.pie()(data);
 
-  let animatedDs = [useMotionValue(arc(pies[0])), useMotionValue(arc(pies[1]))];
+  // let animatedDs = [useMotionValue(arc(pies[0])), useMotionValue(arc(pies[1]))];
 
   // let x = d3.interpolate(arc(pies[0]), arc(pies[1]));
   // let int = d3.interpolate(animatedDs[0].get(), arc(pies[0]));
   // let firstPie = useTransform(progress, (latest) => {
   //   return int(latest);
   // });
-  let firstPieStartAngleState = pies[0].startAngle;
-  let firstPieStartAngle = useSpring(pies[0].startAngle);
-
+  let firstData = data[0];
+  let firstPieData = useSpring(data[0]);
   useEffect(() => {
-    // console.log(firstPieStartAngleState);
-    firstPieStartAngle.set(firstPieStartAngleState);
-  }, [firstPieStartAngle, firstPieStartAngleState]);
-  // console.log(firstPieStartAngle);
+    firstPieData.set(firstData);
+  }, [firstData, firstPieData]);
 
-  let firstPie = useTransform(firstPieStartAngle, (latest) => {
-    return arc({ ...pies[0], startAngle: latest });
+  let firstPie = useTransform(firstPieData, (latest) => {
+    return arc(d3.pie()([latest, 3])[0]);
   });
+
+  // let firstPieStartAngleState = pies[0].startAngle;
+  // let firstPieStartAngle = useSpring(pies[0].startAngle);
+
+  // useEffect(() => {
+  //   firstPieStartAngle.set(firstPieStartAngleState);
+  // }, [firstPieStartAngle, firstPieStartAngleState]);
+
+  // let firstPie = useTransform(firstPieStartAngle, (latest) => {
+  //   return arc({ ...pies[0], startAngle: latest });
+  // });
   // let firstPie = arc
   // let firstPie = useTransform(
   //   progress,
