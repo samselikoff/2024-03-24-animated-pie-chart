@@ -1,113 +1,160 @@
-import Image from "next/image";
+"use client";
+
+import * as d3 from "d3";
+import {
+  animate,
+  animateValue,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useSpring,
+} from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  // let [data, setData] = useState([1, 2]);
+  let width = 200;
+  let height = 200;
+
+  let data = [useSpring(1), useSpring(2)];
+  // const data = [1, 1, 2, 3, 5, 8, 13, 21];
+  // const data = [1, 2];
+
+  // const color = d3
+  //   .scaleOrdinal()
+  //   .domain(data)
+  //   .range(
+  //     d3
+  //       .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), data.length)
+  //       .reverse()
+  //   );
+
+  // const arc = d3
+  //   .arc()
+  //   .innerRadius((width / 2) * 0.67)
+  //   .outerRadius(width / 2 - 1);
+
+  // console.log(pies.map((pie) => arc(pie)));
+
+  // return (
+  //   <div>
+  //     {data.map((value, i) => (
+  //       <Slice
+  //         allValues={data}
+  //         index={i}
+  //         fill={i === 0 ? "#eee" : "#333"}
+  //         key={i}
+  //       />
+  //     ))}
+
+  //     <div className="mt-4">
+  //       <button onClick={() => setData([2, 5])}>Change data</button>
+  //     </div>
+  //   </div>
+  // );
+
+  function handleClick() {
+    data[1].set(3);
+  }
+
+  let pies = d3.pie()([data[0].get(), data[1].get()]);
+  let animatedDs = [useMotionValue(arc(pies[0])), useMotionValue(arc(pies[1]))];
+
+  useMotionValueEvent(data[1], "change", (latest) => {
+    let pies = d3.pie()([data[0].get(), data[1].get()]);
+
+    animatedDs[0].set(arc(pies[0]));
+    animatedDs[1].set(arc(pies[1]));
+  });
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <div>
+      <svg
+        viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`}
+        width={width}
+        height={height}
+      >
+        {data.map((value, i) => (
+          <motion.path
+            initial={false}
+            key={i}
+            // animate={{ d: arc(pie) }}
+            // d={arc(pie)}
+            style={{ d: animatedDs[i] }}
+            // d={d}
+            // fill={color(pie.data)}
+            fill={i === 0 ? "#eee" : "#333"}
+          />
+          // <Slice
+          //   allValues={data}
+          //   index={i}
+          //   fill={i === 0 ? "#eee" : "#333"}
+          //   key={i}
+          // />
+        ))}
+      </svg>
+
+      <div className="mt-4">
+        <button onClick={handleClick}>Change data</button>
       </div>
+    </div>
+  );
+}
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+let arc = d3
+  .arc()
+  .innerRadius((200 / 2) * 0.67)
+  .outerRadius(200 / 2 - 1);
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+function Slice({ allValues, index, fill }) {
+  // let animatedValue = useSpring(allValues[index]);
+  useEffect(() => {
+    let newValue = allValues[index];
+    animatedValue.set(newValue);
+    // console.log(value);
+  }, [allValues, animatedValue, index]);
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+  let pies = d3.pie()(allValues);
+  let d = arc(pies[index]);
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+  let animatedD = useMotionValue(d);
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+  // let animatedValue = useSpring(value);
+
+  // useMotionValueEvent(animatedValue, "change", console.log);
+
+  useEffect(() => {
+    const pies = d3.pie()(allValues);
+    let newD = arc(pies[index]);
+    animatedD.set(newD);
+
+    // console.log(value);
+    // animatedValue.set(value);
+  }, []);
+  // useEffect(() => {
+  //   const pies = d3.pie()(allValues);
+  //   let newD = arc(pies[index]);
+
+  //   animatedD.set(newD);
+  // }, [allValues, animatedD, arc, index]);
+  // useEffect(() => {
+  //   let newD = arc(pie);
+  //   console.log(newD);
+  //   animate(d, newD);
+  // }, [arc, d, pie]);
+
+  // console.log(arc(pie));
+
+  return (
+    <motion.path
+      initial={false}
+      // animate={{ d: arc(pie) }}
+      // d={arc(pie)}
+      style={{ d: animatedD }}
+      // d={d}
+      // fill={color(pie.data)}
+      // fill={i === 0 ? "#eee" : "#333"}
+      fill={fill}
+    />
   );
 }
