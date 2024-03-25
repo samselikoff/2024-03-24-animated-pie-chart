@@ -1,14 +1,7 @@
 "use client";
 
 import * as d3 from "d3";
-import {
-  animate,
-  motion,
-  useMotionValue,
-  useMotionValueEvent,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { motion, useSpring, useTransform } from "framer-motion";
 import { useEffect, useState } from "react";
 
 let arc = d3
@@ -27,28 +20,6 @@ export default function Home() {
 
   let pies = d3.pie()(data);
 
-  let firstDataStartAngleRaw = pies[0].startAngle;
-  let firstDataStartAngle = useSpring(firstDataStartAngleRaw);
-
-  useEffect(() => {
-    firstDataStartAngle.set(firstDataStartAngleRaw);
-  }, [firstDataStartAngle, firstDataStartAngleRaw]);
-
-  let firstPie = useTransform(() => {
-    return arc({ ...pies[0], startAngle: firstDataStartAngle.get() });
-  });
-
-  // let firstData = data[0];
-  // let firstPieData = useSpring(data[0]);
-
-  // useEffect(() => {
-  //   firstPieData.set(firstData);
-  // }, [firstData, firstPieData]);
-
-  // let firstPie = useTransform(firstPieData, (latest) => {
-  //   return arc(d3.pie()([latest, 3])[0]);
-  // });
-
   return (
     <div>
       <svg
@@ -56,20 +27,8 @@ export default function Home() {
         width={width}
         height={height}
       >
-        <motion.path
-          initial={false}
-          // style={{ d: animatedDs[0] }}
-          style={{ d: firstPie }}
-          fill={"#333"}
-        />
-        {/* {data.map((value, i) => (
-          <motion.path
-            initial={false}
-            key={i}
-            d={animatedDs[i]}
-            fill={i === 0 ? "#eee" : "#333"}
-          />
-        ))} */}
+        <Slice pie={pies[0]} fill="#333" />
+        <Slice pie={pies[1]} fill="#999" />
       </svg>
 
       <div className="mt-4">
@@ -79,23 +38,23 @@ export default function Home() {
   );
 }
 
-// function Slice({value}) {
-//   let animatedValue = useSpring(value);
+function Slice({ pie, fill }) {
+  let { startAngle, endAngle } = pie;
+  let animatedStartAngle = useSpring(startAngle);
+  let animatedEndAngle = useSpring(endAngle);
 
-//   useEffect(() => {
-//     animatedValue.set(value);
-//   }, [animatedValue, value]);
+  useEffect(() => {
+    animatedStartAngle.set(startAngle);
+    animatedEndAngle.set(endAngle);
+  }, [animatedEndAngle, animatedStartAngle, endAngle, startAngle]);
 
-//   let d = useTransform(animatedValue, (latest) => {
-//     return arc(d3.pie()([latest, 3])[0]);
-//   });
+  let d = useTransform(() => {
+    return arc({
+      ...pie,
+      startAngle: animatedStartAngle.get(),
+      endAngle: animatedEndAngle.get(),
+    });
+  });
 
-//   return (
-//     <motion.path
-//       initial={false}
-//       // style={{ d: animatedDs[0] }}
-//       style={{ d }}
-//       fill={"#333"}
-//     />
-//   );
-// }
+  return <motion.path initial={false} style={{ d }} fill={fill} />;
+}
