@@ -3,69 +3,90 @@
 import * as d3 from "d3";
 import {
   animate,
-  animateValue,
   motion,
   useMotionValue,
   useMotionValueEvent,
   useSpring,
+  useTransform,
 } from "framer-motion";
 import { useEffect, useState } from "react";
 
+let arc = d3
+  .arc()
+  .innerRadius((200 / 2) * 0.67)
+  .outerRadius(200 / 2 - 1);
+
 export default function Home() {
-  // let [data, setData] = useState([1, 2]);
   let width = 200;
   let height = 200;
+  // let data = [1, 2];
+  let [data, setData] = useState([1, 2]);
+  // let data = [useSpring(1), useSpring(2)];
 
-  let data = [useSpring(1), useSpring(2)];
-  // const data = [1, 1, 2, 3, 5, 8, 13, 21];
-  // const data = [1, 2];
-
-  // const color = d3
-  //   .scaleOrdinal()
-  //   .domain(data)
-  //   .range(
-  //     d3
-  //       .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), data.length)
-  //       .reverse()
-  //   );
-
-  // const arc = d3
-  //   .arc()
-  //   .innerRadius((width / 2) * 0.67)
-  //   .outerRadius(width / 2 - 1);
-
-  // console.log(pies.map((pie) => arc(pie)));
-
-  // return (
-  //   <div>
-  //     {data.map((value, i) => (
-  //       <Slice
-  //         allValues={data}
-  //         index={i}
-  //         fill={i === 0 ? "#eee" : "#333"}
-  //         key={i}
-  //       />
-  //     ))}
-
-  //     <div className="mt-4">
-  //       <button onClick={() => setData([2, 5])}>Change data</button>
-  //     </div>
-  //   </div>
-  // );
-
+  let progress = useMotionValue(1);
   function handleClick() {
-    data[1].set(3);
+    setData([1, 3]);
+    animate(progress, [0, 1]);
+
+    // data[1].set(3);
   }
 
-  let pies = d3.pie()([data[0].get(), data[1].get()]);
+  let pies = d3.pie()(data);
+
   let animatedDs = [useMotionValue(arc(pies[0])), useMotionValue(arc(pies[1]))];
 
-  useMotionValueEvent(data[1], "change", (latest) => {
-    let pies = d3.pie()([data[0].get(), data[1].get()]);
+  // let x = d3.interpolate(arc(pies[0]), arc(pies[1]));
+  // let int = d3.interpolate(animatedDs[0].get(), arc(pies[0]));
+  // let firstPie = useTransform(progress, (latest) => {
+  //   return int(latest);
+  // });
+  let firstPieStartAngleState = pies[0].startAngle;
+  let firstPieStartAngle = useSpring(pies[0].startAngle);
 
-    animatedDs[0].set(arc(pies[0]));
-    animatedDs[1].set(arc(pies[1]));
+  useEffect(() => {
+    // console.log(firstPieStartAngleState);
+    firstPieStartAngle.set(firstPieStartAngleState);
+  }, [firstPieStartAngle, firstPieStartAngleState]);
+  // console.log(firstPieStartAngle);
+
+  let firstPie = useTransform(firstPieStartAngle, (latest) => {
+    return arc({ ...pies[0], startAngle: latest });
   });
+  // let firstPie = arc
+  // let firstPie = useTransform(
+  //   progress,
+  //   [0, 1],
+  //   [animatedDs[0].get(), arc(pies[0])],
+  //   {
+  //     mixer: (a, b) => {
+  //       // console.log("a", a);
+  //       // console.log("b", b);
+  //       let interpolator = d3.interpolate(a, b);
+  //       return (x) => {
+  //         return interpolator(x);
+  //         // console.log(x);
+  //       };
+  //     },
+  //   }
+  //   // { mixer: d3.interpolate }
+  // );
+  // animate(ds[0], 2, )
+  // let animatedDs = [arc(pies[0]), arc(pies[1])];
+  // let animatedDs = [
+  // useTransform(ds[0], [], [1], {mixer: d3.interpolate})
+
+  // let pies = d3.pie()([data[0].get(), data[1].get()]);
+  // let x = d3.interpolate(arc(pies[0]), arc(pies[1]));
+  // // console.log(x);
+  // // debugger;
+  // let animatedDs = [useMotionValue(arc(pies[0])), useMotionValue(arc(pies[1]))];
+
+  // useMotionValueEvent(data[1], "change", (latest) => {
+  //   let pies = d3.pie()([data[0].get(), data[1].get()]);
+
+  //   animatedDs[0].set(arc(pies[0]));
+  //   animatedDs[1].set(arc(pies[1]));
+  // });
 
   return (
     <div>
@@ -74,24 +95,20 @@ export default function Home() {
         width={width}
         height={height}
       >
-        {data.map((value, i) => (
+        <motion.path
+          initial={false}
+          // style={{ d: animatedDs[0] }}
+          style={{ d: firstPie }}
+          fill={"#333"}
+        />
+        {/* {data.map((value, i) => (
           <motion.path
             initial={false}
             key={i}
-            // animate={{ d: arc(pie) }}
-            // d={arc(pie)}
-            style={{ d: animatedDs[i] }}
-            // d={d}
-            // fill={color(pie.data)}
+            d={animatedDs[i]}
             fill={i === 0 ? "#eee" : "#333"}
           />
-          // <Slice
-          //   allValues={data}
-          //   index={i}
-          //   fill={i === 0 ? "#eee" : "#333"}
-          //   key={i}
-          // />
-        ))}
+        ))} */}
       </svg>
 
       <div className="mt-4">
@@ -100,11 +117,6 @@ export default function Home() {
     </div>
   );
 }
-
-let arc = d3
-  .arc()
-  .innerRadius((200 / 2) * 0.67)
-  .outerRadius(200 / 2 - 1);
 
 function Slice({ allValues, index, fill }) {
   // let animatedValue = useSpring(allValues[index]);
