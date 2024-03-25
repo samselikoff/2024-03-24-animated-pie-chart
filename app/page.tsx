@@ -19,23 +19,35 @@ let arc = d3
 export default function Home() {
   let width = 200;
   let height = 200;
-  // let data = [1, 2];
   let [data, setData] = useState([1, 3]);
+
   function handleClick() {
     setData([2, 3]);
   }
 
   let pies = d3.pie()(data);
 
-  let firstData = data[0];
-  let firstPieData = useSpring(data[0]);
-  useEffect(() => {
-    firstPieData.set(firstData);
-  }, [firstData, firstPieData]);
+  let firstDataStartAngleRaw = pies[0].startAngle;
+  let firstDataStartAngle = useSpring(firstDataStartAngleRaw);
 
-  let firstPie = useTransform(firstPieData, (latest) => {
-    return arc(d3.pie()([latest, 3])[0]);
+  useEffect(() => {
+    firstDataStartAngle.set(firstDataStartAngleRaw);
+  }, [firstDataStartAngle, firstDataStartAngleRaw]);
+
+  let firstPie = useTransform(() => {
+    return arc({ ...pies[0], startAngle: firstDataStartAngle.get() });
   });
+
+  // let firstData = data[0];
+  // let firstPieData = useSpring(data[0]);
+
+  // useEffect(() => {
+  //   firstPieData.set(firstData);
+  // }, [firstData, firstPieData]);
+
+  // let firstPie = useTransform(firstPieData, (latest) => {
+  //   return arc(d3.pie()([latest, 3])[0]);
+  // });
 
   return (
     <div>
@@ -67,55 +79,23 @@ export default function Home() {
   );
 }
 
-function Slice({ allValues, index, fill }) {
-  // let animatedValue = useSpring(allValues[index]);
-  useEffect(() => {
-    let newValue = allValues[index];
-    animatedValue.set(newValue);
-    // console.log(value);
-  }, [allValues, animatedValue, index]);
+// function Slice({value}) {
+//   let animatedValue = useSpring(value);
 
-  let pies = d3.pie()(allValues);
-  let d = arc(pies[index]);
+//   useEffect(() => {
+//     animatedValue.set(value);
+//   }, [animatedValue, value]);
 
-  let animatedD = useMotionValue(d);
+//   let d = useTransform(animatedValue, (latest) => {
+//     return arc(d3.pie()([latest, 3])[0]);
+//   });
 
-  // let animatedValue = useSpring(value);
-
-  // useMotionValueEvent(animatedValue, "change", console.log);
-
-  useEffect(() => {
-    const pies = d3.pie()(allValues);
-    let newD = arc(pies[index]);
-    animatedD.set(newD);
-
-    // console.log(value);
-    // animatedValue.set(value);
-  }, []);
-  // useEffect(() => {
-  //   const pies = d3.pie()(allValues);
-  //   let newD = arc(pies[index]);
-
-  //   animatedD.set(newD);
-  // }, [allValues, animatedD, arc, index]);
-  // useEffect(() => {
-  //   let newD = arc(pie);
-  //   console.log(newD);
-  //   animate(d, newD);
-  // }, [arc, d, pie]);
-
-  // console.log(arc(pie));
-
-  return (
-    <motion.path
-      initial={false}
-      // animate={{ d: arc(pie) }}
-      // d={arc(pie)}
-      style={{ d: animatedD }}
-      // d={d}
-      // fill={color(pie.data)}
-      // fill={i === 0 ? "#eee" : "#333"}
-      fill={fill}
-    />
-  );
-}
+//   return (
+//     <motion.path
+//       initial={false}
+//       // style={{ d: animatedDs[0] }}
+//       style={{ d }}
+//       fill={"#333"}
+//     />
+//   );
+// }
