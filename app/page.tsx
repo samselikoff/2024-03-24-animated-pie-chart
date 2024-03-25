@@ -10,7 +10,7 @@ let pie = d3.pie().sort(null);
 let width = 200;
 let height = 200;
 
-let colors = ["#333", "#999", "#ccc"];
+let colors = ["#7dd3fc", "#0ea5e9", "#0369a1"];
 
 export default function Home() {
   let [data, setData] = useState([1, 2, 5]);
@@ -63,8 +63,8 @@ function Slice({ pie, fill }: { pie: d3.PieArcDatum<number>; fill: string }) {
     arc({
       startAngle: animatedStartAngle.get(),
       endAngle: animatedEndAngle.get(),
-      innerRadius: (200 / 2) * 0.67,
-      outerRadius: 200 / 2 - 1,
+      innerRadius: (width / 2) * 0.67,
+      outerRadius: width / 2 - 1,
     })
   );
 
